@@ -3,7 +3,7 @@ from flask_admin.contrib.sqla import ModelView
 from wtforms.fields.numeric import FloatField
 
 from eapp import app, db
-from eapp.models import Category, Product, UserRoleEnum
+from eapp.models import Category, Product, UserRoleEnum, ReceiptDetails, Receipt
 from flask_login import logout_user, current_user
 from flask import redirect, render_template
 
@@ -45,5 +45,7 @@ class LogoutView(BaseView):
 
 admin.add_view(AuthenticatedView(Category, db.session))
 admin.add_view(ProductView(Product, db.session))
+admin.add_view(AuthenticatedView(Receipt, db.session))
+admin.add_view(AuthenticatedView(ReceiptDetails, db.session))
 admin.add_view(StatsView(name='Thống kê'))
 admin.add_view(LogoutView(name='Đăng xuất'))
