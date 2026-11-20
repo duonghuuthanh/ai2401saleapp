@@ -12,6 +12,29 @@
         <h3>Chào <span class="text-success">{{current_user.username}}</span>!</h3>
       </div>
   </div>
+
+
+<div class="row mt-3">
+    <div class="col-6">
+        <table class="table">
+            <tr>
+                <th>Id</th>
+                <th>Tên danh mục</th>
+                <th>Số lượng</th>
+            </tr>
+            {% for s in stats %}
+            <tr>
+                <td>{{ s[0] }}</td>
+                <td>{{ s[1] }}</td>
+                <td>{{ s[2] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div class="col-6">
+        <canvas id="myChart"></canvas>
+    </div>
+</div>
 {% else %}
 <form method="post" action="/login">
   <div class="form-group">
@@ -27,6 +50,21 @@
 {% endif %}
 
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{{ url_for('static', filename='js/draw.js') }}"></script>
+<script>
+    let data = [];
+    let labels = [];
 
+    {% for s in stats %}
+        data.push({{ s[2] }});
+        labels.push('{{ s[1] }}')
+    {% endfor %}
+
+    window.onload = function() {
+
+         drawChart(data, labels, 'Số lượng sản phẩm');
+    }
+</script>
 
 {% endblock %}

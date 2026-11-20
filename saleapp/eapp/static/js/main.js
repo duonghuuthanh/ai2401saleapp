@@ -54,3 +54,16 @@ function deleteCart(id) {
         })
     }
 }
+
+function pay() {
+    if (confirm("Bạn chắc chắn thanh toán không?") == true) {
+        fetch('/api/pay', {
+            'method': 'post'
+        }).then(res => res.json()).then(data => {
+            if (data.status == 200)
+                location.reload();
+            else
+                alert(`Hệ thống bị lỗi, do: ${data.err_msg}`);
+        });
+    }
+}

@@ -1,8 +1,7 @@
 import math
 from flask import render_template, request, redirect, session
 from eapp import app, dao, login, utils
-from flask_login import login_user
-from flask_login import logout_user
+from flask_login import login_user, logout_user, login_required
 
 
 @app.route("/")
@@ -108,6 +107,19 @@ def delete_cart(product_id):
 
     session['cart'] = cart
     return utils.count_cart(cart=cart)
+
+@app.route('/api/pay', methods=['post'])
+@login_required
+def pay():
+    cart = session.get('cart')
+
+    try:
+        dao.add_receipt(cart=cart)
+    except Exception as ex:
+        return {'err_msg': str(ex), 'status': 500}
+    else:
+        del session['cart']
+        return {'status': 200}
 
 
 '''

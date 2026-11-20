@@ -1,13 +1,21 @@
-from flask_admin import Admin, expose, BaseView
+from flask_admin import Admin, expose, BaseView, AdminIndexView
 from flask_admin.contrib.sqla import ModelView
+from urllib3 import request
 from wtforms.fields.numeric import FloatField
 
-from eapp import app, db
+from eapp import app, db, dao
 from eapp.models import Category, Product, UserRoleEnum, ReceiptDetails, Receipt
 from flask_login import logout_user, current_user
 from flask import redirect, render_template
+from datetime import datetime
+from flask import request
 
-admin = Admin(app=app, name="E-commerce's Admin")
+class MyAdminIndexView(AdminIndexView):
+    @expose('/')
+    def index(self):
+        return self.render('admin/index.html', stats=dao.count_products_by_cate())
+
+admin = Admin(app=app, name="E-commerce's Admin", index_view=MyAdminIndexView())
 
 class AuthenticatedView(ModelView):
     def is_accessible(self) -> bool:
@@ -32,7 +40,15 @@ class BaseAuthenticatedView(BaseView):
 class StatsView(BaseAuthenticatedView):
     @expose('/')
     def index(self):
-        return self.render('admin/stats.html')
+        revenue_by_products = dao.cal_revenue_by_product(kw=request.args.get('kw'))
+
+        y = request.args.get('year')
+        if not y:
+            y = datetime.now().year
+
+
+        revenue_by_time = dao.cal_revenue_by_time(time=request.args.get('time', 'month'), year=y)
+        return self.render('admin/stats.html', revenue_by_products=revenue_by_products, revenue_by_time=revenue_by_time)
 
 class LogoutView(BaseView):
     @expose('/')
